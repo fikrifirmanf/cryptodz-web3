@@ -2,7 +2,7 @@ const ProjectDescriptionCard = () => {
   return (
     <div className="max-w-3xl mx-auto">
       <h2 className="text-5xl align font-bold text-gray-600 mb-4">
-        {'The first in the world to pay your debts to me via crypto'.toUpperCase()}
+        {'The first in the world pay your debts to me via crypto'.toUpperCase()}
       </h2>
       <p className="text-lg text-gray-600 leading-relaxed">
         Our project marks a groundbreaking milestone in the realm of debt

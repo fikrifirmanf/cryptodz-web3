@@ -38,6 +38,8 @@ const Header = () => {
 
   const getConnection = async () => {
     if (!isConnected) {
+      setSignerAddress('')
+      setIsWalletConnected(false)
       console.log('disconnected')
     } else {
       const ethersProvider = new BrowserProvider(walletProvider)
@@ -53,7 +55,7 @@ const Header = () => {
 
   useEffect(() => {
     getConnection()
-  }, [signerAddress])
+  }, [signerAddress, isConnected])
 
   return (
     <header className="bg-white bg-opacity-50 backdrop-blur-md shadow-sm fixed w-full z-10 h-20 flex items-center">

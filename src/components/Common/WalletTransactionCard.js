@@ -35,11 +35,14 @@ const WalletTransactionCard = () => {
   // Get signer (account)
 
   // Instantiate the contract with its address and ABI
-  const contractAddress = '0x5583675936aB6b299508d497622204D5B1e9E6bF' // Replace with your contract address
+  const contractAddress = '0x0A1fA0D39147A9c5e9fB1523b689346c7bD57989' // Replace with your contract address
 
   const getBalance = async () => {
     if (!isConnected) {
-      console.log('disconnected')
+        setNetworkName('')
+        setBalance(0)
+        setIsWalletConnected(false)
+        console.log('disconnected')
     } else {
       const ethersProvider = new BrowserProvider(walletProvider)
       const signer = await ethersProvider.getSigner()
@@ -102,6 +105,86 @@ const WalletTransactionCard = () => {
     }
   }
 
+  const buyToken = async() => {
+    setIsLoading(true) // Set isLoading to true when the transaction begins
+    try {
+      const ethersProvider = new BrowserProvider(walletProvider)
+      const signer = await ethersProvider.getSigner()
+      // The Contract object
+      const contract = new Contract(contractAddress, contractAbi, signer)
+      // Call the contract function to transfer Ether
+      const transaction = await contract.buyTokens({
+        value: ethers.parseEther(value)
+      })
+
+      // Wait for the transaction to be mined
+      const receipt = await transaction.wait()
+
+      console.log('Transaction mined. Receipt:', receipt)
+
+      // Get the transaction hash from the receipt
+      const txHash = receipt.hash
+
+      // Log the transaction hash
+      console.log('Transaction hash:', txHash)
+
+      console.log('Ether transferred successfully')
+      setTransactionHash(txHash)
+      setIsTransferCompleted(true) // Set isTransferCompleted to true after the transaction is completed
+      setValue('')
+      setModalMessage(
+        'Transaction successful 😊'
+      ) // Set modal message
+      getBalance()
+    } catch (error) {
+      setModalMessage('Transaction failed!') // Set modal message
+
+      console.error('Error transferring Ether:', error)
+    } finally {
+      setIsModalOpen(true)
+      setIsLoading(false) // Set isLoading to false after the transaction (whether successful or not)
+    }
+  }
+
+  const sellToken = async() => {
+    setIsLoading(true) // Set isLoading to true when the transaction begins
+    try {
+      const ethersProvider = new BrowserProvider(walletProvider)
+      const signer = await ethersProvider.getSigner()
+      // The Contract object
+      const contract = new Contract(contractAddress, contractAbi, signer)
+      // Call the contract function to transfer Ether
+      const transaction = await contract.sellTokens(ethers.parseEther(value))
+
+      // Wait for the transaction to be mined
+      const receipt = await transaction.wait()
+
+      console.log('Transaction mined. Receipt:', receipt)
+
+      // Get the transaction hash from the receipt
+      const txHash = receipt.hash
+
+      // Log the transaction hash
+      console.log('Transaction hash:', txHash)
+
+      console.log('Ether transferred successfully')
+      setTransactionHash(txHash)
+      setIsTransferCompleted(true) // Set isTransferCompleted to true after the transaction is completed
+      setValue('')
+      setModalMessage(
+        'Transaction successful 😊'
+      ) // Set modal message
+      getBalance()
+    } catch (error) {
+      setModalMessage('Transaction failed!') // Set modal message
+
+      console.error('Error transferring Ether:', error)
+    } finally {
+      setIsModalOpen(true)
+      setIsLoading(false) // Set isLoading to false after the transaction (whether successful or not)
+    }
+  }
+
   const closeModal = () => {
     setIsModalOpen(false) // Close modal
     setIsTransferCompleted(false) // Reset transfer completion state
@@ -113,7 +196,7 @@ const WalletTransactionCard = () => {
 
   useEffect(() => {
     getBalance()
-  }, [])
+  }, [isConnected])
 
   return (
     <>
@@ -179,7 +262,7 @@ const WalletTransactionCard = () => {
             </button>
           ) : (
             <button
-              onClick={() => sendTransaction()}
+              onClick={() => !isWalletConnected ? open () : sellToken()}
               className="flex items-center justify-center font-semibold bg-gradient-to-r from-cyan-500 to-green-500 text-white px-5 py-5 rounded-2xl transition duration-300 w-full"
             >
               <WalletIcon className="w-6 h-6 mr-2 text-3xl text-white" />
